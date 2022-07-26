@@ -1,29 +1,38 @@
+import java.util.concurrent.locks.ReentrantLock;
+
 public class SavingsAccount {
 
     private long total = 0;
     private final int accountNumber;
+    private ReentrantLock mutex=new ReentrantLock();
 
     public SavingsAccount() {
         accountNumber = hashCode();
     }
 
-    public synchronized boolean withdraw(long amount) {
+    public boolean withdraw(long amount) {
+        mutex.lock();
         if (total >= amount) {
             total -= amount;
-            System.out.println("Withdrew $" + amount + " from account " + accountNumber);
+            System.out.println("Withdrew $" + amount + " from account " + accountNumber + ". New balance is $" + total);
+            mutex.unlock();
             return true;
         } else {
             System.out.println("Could not withdraw $" + amount + " since the balance of account " + accountNumber+ " is $" + total);
+            mutex.unlock();
             return false;
         }
+
     }
 
-    public synchronized void deposit(long amount) {
+    public void deposit(long amount) {
+        mutex.lock();
         total += amount;
         System.out.println("Deposited $" + amount + ". New account balance for " + accountNumber + " is $" + total);
+        mutex.unlock();
     }
 
-    public synchronized long getTotal() {
+    public long getTotal() {
         return total;
     }
 
